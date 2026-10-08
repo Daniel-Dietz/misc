@@ -2,6 +2,7 @@
 #
 # Name: script-template.sh
 # Purpose: Reference template for a documented standalone Bash utility.
+# Repository status: Template/example; not a deployed utility.
 # Scope: Demonstration only; does not change data or implement a real task.
 # Runtime: Bash 4.4+ on Linux (illustrative; not tested on every platform).
 # Dependencies: Bash built-ins only.
@@ -12,6 +13,8 @@
 # Side effects: None; no filesystem or network writes.
 # Exit status: 0 for normal operation/help; 2 for invalid arguments.
 # Security: No secrets or external configuration.
+# Known limitations: This template is not a working operational script;
+#   adapt the metadata, implementation and safety review for real use.
 # Recovery: None needed; this template changes no data.
 #
 set -euo pipefail
