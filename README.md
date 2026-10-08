@@ -12,7 +12,7 @@ Use this table to find code by file name or by the problem it solved. **Add one 
 
 | File | What it does / problem solved | Status | Runtime / context |
 | --- | --- | --- | --- |
-| _No scripts added yet._ | Add actual scripts here when they are committed. | — | — |
+| [scripts/maintenance/immich-post-update-cleanup.sh](scripts/maintenance/immich-post-update-cleanup.sh) | Retains the newest verified Immich upgrade backup, removes older upgrade/.env backups and obsolete Immich-stack images, and can explicitly prune unused dangling images after an update. | Reusable | Bash 4.4+, Linux, Docker Compose v2; developed from Debian 13 / Immich v3.3.0 maintenance |
 
 ### Status labels
 
