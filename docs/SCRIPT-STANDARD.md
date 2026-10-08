@@ -1,60 +1,72 @@
 # Script and code-level documentation standard
 
-**Status: mandatory for all scripts in this repository.** Apply these conventions proportionately: a ten-line helper need not have a multi-page manual, but its behavior must still be explicit.
+This repository is **both an operational toolbox and an archive of solutions**. The minimum below helps future readers understand a script and its risks. The fuller engineering practices are expected when **developing or maintaining a reusable utility**; they are **not admission criteria for one-off fixes, snapshots, experiments or imperfect historical code**.
 
-## 1. Scope and naming
+**Core rule:** Prefer understandable, safely reusable scripts. If a script is not ready for reuse, **say why** and document **the particular problem it was created to solve**. Do not silently pass off historical or insecure code as production-ready.
 
-Each script should do one operational job and be usable independently or with minimal companion files. Choose descriptive lowercase hyphenated names and the appropriate extension (for example `cleanup-immich-backups.sh`, `inspect-dhcp.ps1`, `check-config.py`). Do not rename an existing script solely for style. Prefer directory categories only when needed.
+## 1. Classify intended use and risks
 
-The README quick-reference index is the repository's discovery catalog. Include the **actual relative file path**, a one-sentence description and supported runtime/platform. Keep links accurate as files change.
+Use the same labels in the README index and the script header or companion note:
 
-## 2. Mandatory file header
+- **Reusable:** intended for repeat use; apply the function documentation, robustness and validation expectations below.
+- **Adapt first:** useful as a starting point for a different environment or recurrence of a similar incident; identify required adaptations and incomplete checks.
+- **Reference only:** historical, incomplete, experimental, untested or otherwise retained for learning rather than direct execution.
+- **UNSAFE:** an additional prominent flag when known vulnerabilities, insecure assumptions or materially unsafe behavior exist (e.g. **Reference only — UNSAFE**). Explain the specific risk, such as unsafe permissions, unbounded deletion, unvalidated input, disabled security checks or sensitive logging.
 
-At the top of **every script**, state:
+A script's **status is not proof of security**. Distinguish **known unsafe** from **not reviewed / unverified**; both deserve clear warnings, but lack of testing alone does not prove a vulnerability.
 
-- **Name and purpose:** what problem the script solves and what it explicitly does not do, if material.
-- **Compatibility:** language/interpreter and tested operating systems or versions.
-- **Prerequisites:** required commands, libraries, services, API privileges, files and network access.
-- **Usage:** command syntax, flags/arguments and at least one safe example.
-- **Inputs and outputs:** input sources and formats; output paths, formats and logs.
-- **Effects and safety:** whether it is read-only, creates/overwrites/deletes data, restarts services or changes remote systems. Document confirmation, dry-run support or safeguards.
-- **Failure and recovery:** exit code behavior, important error conditions, verification and how to recover from partial execution.
-- **Security:** privileges required, handling of secrets and sensitive data; environment-specific assumptions.
-- **Ownership/maintenance:** optional contact or source link, particularly for scripts derived from external projects.
+## 2. Minimum archival record — all scripts
 
-Adapt comment syntax to the language (Bash `#`, PowerShell comment-based help, Python module docstrings, etc.). Never embed secrets in the header.
+Include a small comment header in the script **or** a linked adjacent Markdown note when preserving the exact original code is important. Capture what is known:
 
-## 3. Mandatory documentation for each function
+1. **Purpose and history:** the specific job, issue or incident solved; observed outcome if known.
+2. **Context:** intended language, platform, service/version and any host-specific assumptions when known.
+3. **Invocation:** how it was used, prerequisites and required privileges where known; do not invent a tested command.
+4. **Effects:** files, data, services, network access or accounts it reads or changes; especially delete/overwrite/restart behavior.
+5. **Status, verification and gaps:** use the labels above; state whether it was tested and what is incomplete or unknown.
+6. **Risks before reuse:** known security flaws, destructive operations, missing safeguards, outdated dependencies and likely modifications required.
 
-**Every declared function/method, public or internal, must have documentation at its definition.** Explain:
+Keep the **README quick-reference row** aligned with that information. For an old snippet with incomplete historical context, say so directly (for example, "Original target version unknown; not retested"). A long manual, full parameterization, test suite or refactor is **not required to retain reference-only material**.
 
-1. **Purpose and contract** — what the function does and when it is called.
-2. **Arguments** — name, type or expected format, meaning, allowed range/defaults when applicable.
-3. **Results** — returned value, stdout/output, status/exit behavior; say explicitly if there is no meaningful return.
-4. **Side effects** — filesystem, network, services, process state, global variables or external commands it changes/calls.
-5. **Failures** — important raised errors, non-zero results, and how callers handle them.
+**Always remove live credentials, tokens, keys and sensitive production data before committing.** Mark where placeholders were substituted.
 
-Use idiomatic documentation formats: PowerShell `.SYNOPSIS`, `.PARAMETER`, `.OUTPUTS`; Python PEP 257 docstrings with Args/Returns/Raises; Bash documentation blocks immediately before the function. Avoid made-up return contracts: in Bash, distinguish stdout data from function exit status; in PowerShell distinguish pipeline output from a process exit code.
+## 3. Function-level documentation — strong default for maintained scripts
 
-Also document non-obvious *external references*: API endpoints, commands with surprising flags, environment variables, configuration keys and relevant third-party protocols. Link to upstream specifications when useful. Explain **why** an unusual step is needed, not merely what the code line does.
+Code-level documentation is a priority in this repository. For **Reusable** scripts, document **every declared function/method**, public and internal, close to its definition:
 
-## 4. Robustness and operational safety
+1. **Purpose and contract:** what it does and why.
+2. **Arguments:** names, types/formats, constraints and defaults where applicable.
+3. **Results:** return value, stdout/pipeline output, exit status or explicitly no meaningful output.
+4. **Side effects:** files, network, services, process/global state and external calls.
+5. **Failure cases:** material errors and caller-visible behavior.
 
-- Default to least privilege and non-destructive behavior. Prefer `--dry-run` for cleanup, replacement and bulk changes; when unavailable, document why and provide precise safeguards.
-- Validate prerequisites and input values **before** applying changes. Avoid broad glob/deletion targets; canonicalize and check target paths, reject dangerous/empty values, and state the exact retention policy.
-- Make re-runs idempotent where practical. Explicitly flag operations that are not safe to retry.
-- Implement clear success/failure reporting and meaningful non-zero failures. Preserve original errors; do not hide failures behind permissive handlers.
-- Quote shell expansions and defend against whitespace, special characters, unexpected filenames and injection.
-- Treat credentials as sensitive: do not hardcode or echo them; avoid secrets in command-line arguments if safer alternatives exist. Do not commit `.env` or real backup data.
-- Use temporary files safely and clean them up without deleting user data. Handle interrupts where applicable.
-- For backups, explicitly describe consistency requirements, verification, retention, restore steps and the separation between backing up and deleting old archives.
+Use language-appropriate forms: Bash documentation comments; PowerShell comment-based help (`.SYNOPSIS`, `.PARAMETER`, `.OUTPUTS`); Python docstrings (Args/Returns/Raises). Explain non-obvious external commands, API endpoints, configuration keys and protocol assumptions, including **why** unusual operations are necessary.
 
-## 5. Validation and maintenance
+For **Adapt first** scripts, aim for the same standard where practical and mark documentation gaps. For **Reference only**, retaining imperfect original comments or undocumented helpers is acceptable **if the limitations are disclosed**. Do not rewrite a historical artifact solely to satisfy a documentation quota.
 
-Each change must specify an appropriate check, such as `bash -n`, `shellcheck`, PowerShell parsing/PSScriptAnalyzer, Python compilation/linting or focused unit tests. Test the documented happy path plus significant failure paths, preferably in a disposable environment. If production systems or credentials are needed and tests could not be run, state that clearly rather than claiming success.
+## 4. Engineering expectations for maintained/reusable utilities
 
-For any change affecting usage, requirements, safety or behavior, update the header and function documentation at the same time. Update the README index for additions, deletions, moves or changed purposes. Do not leave stale examples or dead links.
+When actively developing a reusable tool, provide a clear file header covering purpose, supported versions, dependencies, permissions, CLI usage with examples, inputs/outputs, safety, security, failure behavior and recovery.
 
-## 6. Script template
+- Default to least privilege and non-destructive operations. Prefer a real `--dry-run` for bulk and destructive changes.
+- Validate prerequisites and inputs before changes; avoid unbounded deletion, dangerous paths, injection and surprising side effects.
+- Favor rerun safety/idempotency when practical; document exceptions.
+- Quote shell expansions correctly, use temporary files safely, handle interrupts and propagate failures with actionable diagnostics.
+- Avoid leaking secrets into logs and arguments; use appropriate configuration methods.
+- For backup/restore/cleanup scripts, document consistency requirements, the exact retention/deletion scope, verification and restore/recovery steps.
 
-Start from [the Bash template](../templates/script-template.sh) for Bash-based utilities, adapting rather than copying unneeded options. Other languages must follow the **same documentation contract** using native syntax.
+These are **improvement goals rather than archive-entry gates**. An old script that lacks them can remain here as **Adapt first** or **Reference only**, with **UNSAFE** added for any known material weakness. Merely writing a warning does **not** make the code safe to run.
+
+## 5. Validation and lifecycle
+
+For **Reusable** scripts, run an appropriate syntax/static check and targeted functionality/failure tests (for example `bash -n` / ShellCheck, PSScriptAnalyzer, Python compilation/tests). Record tested environments and important limitations; never report tests that were not performed.
+
+For **Adapt first** and **Reference only** scripts, **testing is optional for archival**. State **not tested / unverified** when appropriate and preserve any known success or failure evidence without claiming broader compatibility.
+
+When promoting old code to maintained use, improve the documentation, tests and safeguards. When behavior, intended use or risk changes, update the header or companion note and the README entry. Keep links accurate.
+
+## 6. File organization and starting point
+
+Choose descriptive paths under `scripts/<category>/`, including `incidents/` or `reference/` if useful. Language and category conventions are guidance, not prerequisites for keeping a historically useful filename.
+
+The [Bash script template](../templates/script-template.sh) illustrates full inline documentation for a newly maintained utility. **Archived one-offs are not required to adopt the template.**
