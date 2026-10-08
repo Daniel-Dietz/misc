@@ -1,42 +1,65 @@
 # Miscellaneous Scripts & Utilities
 
-A home for **small, standalone, reusable or potentially reusable scripts** that do not warrant a dedicated repository. Examples include backup/restore helpers, one-off maintenance procedures, administrative tools, diagnostics, migration helpers and single-file automations.
+A long-term collection of **small scripts, workarounds and useful code examples** that do not fit naturally into another repository. The point is to preserve past work so a similar task can start from something useful rather than from zero.
 
-This repository is **not** a dumping ground for undocumented experiments, secrets, generated output or project-specific code that belongs in its own repository. Scripts should be understandable, auditable and safely reusable by someone other than the original author.
+This includes reusable operational tools, backup and maintenance helpers, diagnostics, migrations, **one-off incident fixes**, environment-specific commands, prototypes and historical examples. **A script does not have to be polished, portable, fully tested or production-ready to belong here.** A single-use script that solved one problem can be worth keeping.
+
+> **Principle:** Scripts should be understandable and safely reusable **where practical**. Otherwise, clearly mark them as **unverified, unsafe or reference-only**, describe **the specific problem or one-off issue they solved**, and explain any known risks or changes needed before using them again. Saving an imperfect solution is useful; presenting it as generally safe is not.
 
 ## Quick reference
 
-**Every executable or utility added to the repository must have exactly one entry here.** Use a relative Markdown link to the actual file; write a concise purpose statement, not just the language. Keep entries sorted by file path. Documentation and templates are listed separately.
+Use this table to find code by file name or by the problem it solved. **Add one row for every script**, including one-offs and reference-only examples, with a working relative link and a useful description. Keep entries sorted by path.
 
-| File | Purpose | Runtime / platform |
-| --- | --- | --- |
-| _No utility scripts added yet._ | Add scripts here as they are introduced. | — |
+| File | What it does / problem solved | Status | Runtime / context |
+| --- | --- | --- | --- |
+| _No scripts added yet._ | Add actual scripts here when they are committed. | — | — |
+
+### Status labels
+
+- **Reusable** — intended for repeated use; still inspect its assumptions and risks before running.
+- **Adapt first** — built for a particular host, environment or incident; use as a starting point and adjust it.
+- **Reference only** — retained for ideas or historical context; incomplete, untested, outdated or otherwise not intended for direct execution.
+- Add **UNSAFE** visibly to the status (for example, **Reference only — UNSAFE**) whenever a known security weakness or material unsafe behavior is present. Explain the *specific* issue in the file header or companion note. Labeling an issue does not fix it.
+
+The status is an **intended-use description, not a security certification**. If the behavior has not been verified, say **not tested / unverified**; never imply it was tested.
 
 ### Documentation and templates
 
 | File | Purpose |
 | --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Short checklist for adding or changing scripts and updating this index. |
-| [docs/SCRIPT-STANDARD.md](docs/SCRIPT-STANDARD.md) | Mandatory documentation, safety, security and quality conventions. |
-| [templates/script-template.sh](templates/script-template.sh) | Documented Bash starting point; copy and adapt for a real utility. |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Minimal requirements for archiving scripts and higher standards for reusable utilities. |
+| [docs/SCRIPT-STANDARD.md](docs/SCRIPT-STANDARD.md) | Documentation and safety conventions, with explicit allowances for one-offs and incomplete examples. |
+| [templates/script-template.sh](templates/script-template.sh) | Documented Bash starting point for a new utility; optional for archived scripts. |
+
+## Minimum context for anything stored here
+
+Even an unfinished or unsafe one-off needs enough information for a future reader to understand why it is here:
+
+1. **What happened / what it solves:** a concrete purpose, incident or use case, including relevant environment or version details *when known*.
+2. **Intended use:** a status from above, how it was run (if known), and whether it actually worked or was tested.
+3. **Risks and limits:** known unsafe or insecure practices, destructive side effects, special prerequisites, environment-specific assumptions and missing verification. State unknowns honestly.
+4. **Discoverability:** an entry in the quick-reference table. Put the context in the script header or a linked companion note when keeping the original script unchanged.
+
+**Do not commit real credentials, private keys, sensitive production data or backups.** Redact them even when preserving historical scripts.
+
+Complete function documentation, input validation, safe defaults and tests are the **target for maintained/reusable utilities**, not a prerequisite for preserving every one-off. If documentation or safeguards are missing, **call out those gaps** rather than discarding useful reference material. See [the script standard](docs/SCRIPT-STANDARD.md).
 
 ## Organization
 
-- Keep simple, independent scripts under `scripts/<category>/<descriptive-name>.<ext>` (for example `scripts/backup/`, `scripts/maintenance/`, `scripts/network/`, `scripts/diagnostics/`, `scripts/migration/`). Create a category only when needed.
-- Keep multi-file assets required by a script beside it or in a clearly named subdirectory; if it becomes a maintained application or substantial project, move it to its own repository.
-- The script file is the main source of truth for usage and implementation details. Put optional extended operational guides under `docs/` and link them from the script header.
-- Prefer standard libraries, explicit runtime requirements and minimal dependencies.
-- Never commit credentials, production data, private keys, machine-specific personal configuration or unreviewed backups.
+- Prefer `scripts/<category>/<descriptive-name>.<ext>` (for example `backup/`, `maintenance/`, `diagnostics/`, `migration/`, `incidents/` or `reference/` under `scripts/`). Create folders as needed; the categories are suggestions, not admission rules.
+- Keep related notes or sample configuration (sanitized) beside the script when that makes the original problem easier to understand.
+- A dedicated project belongs in its own repository when appropriate, but small partial implementations and one-off excerpts may still be preserved here for reference.
+- Prefer few dependencies for maintained scripts. Historical scripts may retain obsolete dependencies if they are documented.
 
-## How to use
+## Before using a script
 
-1. Find the utility by file name or purpose in **Quick reference**.
-2. Read its header for prerequisites, supported platforms, required permissions, arguments, side effects and examples.
-3. Inspect the implementation and run `--help` when provided. Test with dry-run or a non-production target whenever supported.
-4. Review backups, cleanup scope and recovery instructions before any destructive action.
+1. Find it in the quick reference and check **status** and **known risks**.
+2. Read the script and any associated notes. Confirm prerequisites, target system, permissions, file paths and side effects.
+3. **Do not execute Reference only or UNSAFE code as-is.** Adapt and independently review it before use.
+4. For cleanup, restore or other destructive operations, verify exact targets, backups and recovery steps. Prefer a test environment or dry run where available.
 
-**Important:** Scripts are provided as operational tools, not universally safe commands. Check the individual script’s assumptions and environment before running it.
+This repository is a **knowledge base as well as a toolbox**. Inclusion means that the code may be useful, **not that it is approved for production**.
 
-## Adding or changing a utility
+## Adding or changing a script
 
-Follow [CONTRIBUTING.md](CONTRIBUTING.md) and [the script standard](docs/SCRIPT-STANDARD.md). In particular, **document every function and its parameters, return values and side effects**, including helpers. Code-level documentation is mandatory, not optional. Every new script must be indexed in this README in the same change.
+Follow [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/SCRIPT-STANDARD.md](docs/SCRIPT-STANDARD.md). Preserve the context and risks of one-offs; use the full documentation standard, including documenting each function and its side effects, when turning a script into a maintained reusable utility. Update this index with the script in the same change.
