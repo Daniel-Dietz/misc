@@ -1,25 +1,32 @@
 # Contributing scripts
 
-The goal is **small, reusable, reviewable and well-documented tools**.
+The goal is to **preserve useful work and make it discoverable**, whether it is a maintained utility, a one-time workaround or an incomplete historical reference. **A script does not need to meet production-readiness, portability or test-coverage standards just to be archived here.** We should be able to tell what it solved and how risky it would be to reuse.
 
-## Checklist for every new or modified script
+## Minimum for every script (including one-offs)
 
-- [ ] Scope fits this repository; one clear responsibility and a descriptive file name/path.
-- [ ] Update the **README quick-reference table** with a working relative link, purpose and runtime/platform; remove or update old entries when renaming/deleting.
-- [ ] Add or update a header describing purpose, requirements, permissions, invocation, inputs, outputs, side effects, safety and examples.
-- [ ] Document **every function** (including private/helper functions): purpose, parameters and accepted values, return/output/exit behavior, side effects, relevant errors and external calls where applicable.
-- [ ] Add comments explaining non-obvious decisions, assumptions, protocol interactions and risky operations. Do not substitute obvious line-by-line comments for meaningful explanations.
-- [ ] Use safe defaults, validate inputs, quote/escape values correctly, and avoid hidden destructive behavior. Explicitly describe deletion, overwrite, network changes and privilege requirements.
-- [ ] Keep secrets, credentials, host-specific sensitive values and real datasets out of commits and examples.
-- [ ] Provide at least a syntax/static check and a targeted test or documented manual verification step; include expected results and limitations.
-- [ ] Make dependencies explicit; pin versions only where technically needed; document supported versions.
-- [ ] Ensure diagnostics are actionable and exit codes are meaningful. Never silently ignore failures.
-- [ ] For backup/restore and cleanup scripts, document what is retained, what is deleted, exclusion rules, verification of success and recovery procedure.
+- [ ] Add or update **one README quick-reference entry**, with relative link, concrete purpose/issue solved, status and runtime/context when known.
+- [ ] Choose **Reusable**, **Adapt first** or **Reference only**. If there is a known material security problem or unsafe behavior, append **UNSAFE** and say precisely why. An untested script must not be described as validated.
+- [ ] Explain the original task or incident, relevant environment/assumptions, what worked (if known) and what would have to change before reuse.
+- [ ] Disclose **known risks**, data deletion/overwrites, required privileges, dependencies, external service calls and missing checks as far as they are known. Clearly label unknowns instead of inventing guarantees.
+- [ ] Provide this context in a brief file header or nearby documentation linked from the README. If preserving an exact historical script is important, **a companion note is fine**; no refactoring is required just to keep it.
+- [ ] Remove credentials, secrets, tokens, private keys and sensitive production data. Use obvious sanitized placeholders if needed.
 
-See [docs/SCRIPT-STANDARD.md](docs/SCRIPT-STANDARD.md) for the full rules and [templates/script-template.sh](templates/script-template.sh) for an example.
+These are **documentation and disclosure requirements**, not a demand to make every archived script safe to execute. Reference-only code may be insecure, incomplete, non-idempotent, untested or environment-specific **if that is visible and explained**. Never imply that an untested workaround is a production-ready solution.
 
-## Review expectation
+## When creating or maintaining a reusable utility
 
-Changes should be reviewable without running them on a production system. Review focuses on correctness, safety, reproducibility, understandable code and complete documentation, not cosmetic nitpicking. If a requirement does not apply, explain why in the script header or change description.
+Use [docs/SCRIPT-STANDARD.md](docs/SCRIPT-STANDARD.md) as the engineering target:
 
-Do not add placeholder entries for scripts not yet committed.
+- Document **each function**, including helpers: purpose, parameters, return values or output, side effects, errors and external dependencies.
+- Document CLI usage, versions, prerequisites, examples, inputs/outputs, security model and recovery.
+- Prefer safe defaults, parameter validation, meaningful exit codes, least privilege, idempotency and dry-run support for risky actions.
+- Run appropriate syntax/static checks and functional tests, including important failure scenarios, and state what was actually validated.
+- For backup, restore and cleanup tools, describe retention, exclusion rules, consistency, verification, destructive scope and recovery.
+
+If a previously archived script becomes maintained/reusable, improve its documentation and safeguards as part of that transition. Lack of these improvements **does not prevent its continued inclusion as a clearly labeled reference**.
+
+## Review and maintenance
+
+Review a **Reference only** submission primarily for usefulness, intelligible context, accurate warnings and secret removal—not cosmetic style or production-readiness. Review a **Reusable** submission more rigorously for code-level documentation, correctness, safety and testing.
+
+When moving, renaming or removing scripts, update the README entry and any companion links. Do not index scripts that have not actually been committed. For the Bash starting point see [templates/script-template.sh](templates/script-template.sh).
