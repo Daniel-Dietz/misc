@@ -12,6 +12,9 @@ Use this table to find code by file name or by the problem it solved. **Add one 
 
 | File | What it does / problem solved | Status | Runtime / context |
 | --- | --- | --- | --- |
+| [scripts/accounting/kivitendo-datev-extract.pl](scripts/accounting/kivitendo-datev-extract.pl) | Extracts monthly booking files and archived PDF references through the kivitendo console in a read-only transaction. | Adapt first | Perl; customized kivitendo 4.0.1 EXTF 700/13 exporter; [setup and limits](scripts/accounting/kivitendo-datev-handover.md) |
+| [scripts/accounting/kivitendo-datev-handover.py](scripts/accounting/kivitendo-datev-handover.py) | Prepares immutable DATEV snapshots and an explicitly queued outbox with PDF/XML links, integrity checks and duplicate-period protection; no upload/import. | Adapt first | Python 3.11+, Linux, Perl XML::LibXML; [setup and limits](scripts/accounting/kivitendo-datev-handover.md) |
+| [scripts/accounting/test-kivitendo-datev-handover.py](scripts/accounting/test-kivitendo-datev-handover.py) | Verifies archive metadata, PDF hashes and handover failure cases on temporary copies of a prepared snapshot. | Adapt first | Python 3.11+; requires a prepared snapshot |
 | [scripts/maintenance/immich-post-update-cleanup.sh](scripts/maintenance/immich-post-update-cleanup.sh) | Retains the newest verified Immich upgrade backup, removes older upgrade/.env backups and obsolete Immich-stack images, and can explicitly prune unused dangling images after an update. | Reusable | Bash 4.4+, Linux, Docker Compose v2; developed from Debian 13 / Immich v3.3.0 maintenance |
 
 ### Status labels

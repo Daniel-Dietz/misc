@@ -1,0 +1,13 @@
+{
+  "database": "example_skr04",
+  "client_id": 2,
+  "login": "example",
+  "app_dir": "/var/www/kivitendo-erp",
+  "output_dir": "/var/lib/kivitendo/datev-handover/example_skr04",
+  "extractor": "/usr/local/lib/kivitendo-datev-handover/kivitendo-datev-extract.pl",
+  "document_xsd": "/usr/local/share/kivitendo-datev-handover/Document_v060.xsd",
+  "start_date": "2026-07-13",
+  "consultant_number": "1001",
+  "client_number": "1",
+  "timezone": "Europe/Berlin"
+}
