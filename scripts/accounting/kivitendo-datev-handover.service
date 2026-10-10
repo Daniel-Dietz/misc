@@ -1,0 +1,17 @@
+[Unit]
+Description=Prepare private DATEV file handover from kivitendo
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 /usr/local/lib/kivitendo-datev-handover/kivitendo-datev-handover.py --config /etc/kivitendo/datev-file-handover.json prepare
+TimeoutStartSec=15min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/kivitendo/datev-handover

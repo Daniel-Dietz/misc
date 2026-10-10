@@ -1,0 +1,10 @@
+[Unit]
+Description=Prepare DATEV file handover daily at 02:15 Europe/Berlin
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 Europe/Berlin
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target
