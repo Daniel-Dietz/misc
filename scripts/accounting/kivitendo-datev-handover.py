@@ -66,8 +66,22 @@ def load_config(path):
         raise ValueError('Invalid client number')
     dt.date.fromisoformat(cfg['start_date'])
     cfg['client_id'] = int(cfg['client_id'])
+    if cfg.get('reader_user') and not re.fullmatch(r'[a-z_][a-z0-9_-]*', cfg['reader_user']):
+        raise ValueError('Invalid reader_user')
     ZoneInfo(cfg.get('timezone', 'Europe/Berlin'))
     return cfg
+
+
+def reader_access(cfg, path, recursive=False):
+    """Grant the configured transport user read/traverse ACLs on published data.
+
+    Requires Linux setfacl and ownership of path. Does not grant write access.
+    Parent traversal is configured separately during installation; raises on
+    ACL failure so unreadable output is not reported as delivered.
+    """
+    if cfg.get('reader_user'):
+        command = ['setfacl'] + (['-R'] if recursive else [])
+        subprocess.run(command + ['-m', 'u:' + cfg['reader_user'] + ':rX', str(path)], check=True)
 
 
 def validate_period(folder, period, cfg):
@@ -291,9 +305,10 @@ def prepare(cfg, root, asof):
                   'periods': {p: {'rows': m['rows'], 'linked_rows': m['linked_rows'],
                     'provisional': p == asof[:7]} for p, m in periods.items()},
                   'unique_invoice_pdfs': len(documents), 'additional_files': len(extra_bytes),
-                  'transport_configured': False, 'datev_import_confirmed': False}
+                  'transport_configured': bool(cfg.get('transport_configured', False)), 'datev_import_confirmed': False}
         write_json(root / 'latest.json', status)
         write_json(root / 'status.json', status)
+        reader_access(cfg, root / 'status.json')
         print(json.dumps(status, ensure_ascii=False))
         if conflicts:
             raise RuntimeError('Previously queued periods changed; do not import a second full batch')
@@ -346,9 +361,14 @@ def queue(cfg, root, period, snapshot, allow_partial):
         shutil.copyfile(source / 'Buchungen' / period / meta['file'], package / meta['file'])
         if new:
             document_zip(package / 'Belege-XML.zip', new, dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds'), cfg, manifest['document_metadata'])
-        write_json(package / 'manifest.json', dict(meta, period=period, snapshot=snapshot,
+        file_hashes = {f.name: digest(f.read_bytes()) for f in package.iterdir() if f.is_file()}
+        write_json(package / 'manifest.json', dict(meta, schema=2, period=period, snapshot=snapshot,
+            database=cfg['database'], consultant_number=str(cfg['consultant_number']),
+            client_number=str(cfg['client_number']), files=file_hashes,
             status='queued_locally_not_transferred', documents={guid:digest(pdf) for guid,pdf in new.items()}))
         (root / 'outbox').mkdir(exist_ok=True)
+        reader_access(cfg, root / 'outbox')
+        reader_access(cfg, package, recursive=True)
         package.rename(destination)
     print(json.dumps({'status':'queued_locally_not_transferred','path':str(destination)}))
 
@@ -387,6 +407,7 @@ def main():
             if args.action == 'prepare':
                 write_json(root / 'status.json', {'status':'failed','error':str(error),
                     'checked_at':dt.datetime.now(dt.timezone.utc).isoformat()})
+                reader_access(cfg, root / 'status.json')
             raise
 
 
