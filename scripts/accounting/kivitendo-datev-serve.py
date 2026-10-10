@@ -4,7 +4,8 @@
 Python 3.11+, Linux/OpenSSH. Install root-owned; invoke ONLY as a dedicated
 unprivileged user's forced SSH command with `restrict` authorized_keys options.
 Usage: kivitendo-datev-serve.py --config /etc/kivitendo/datev-reader.json
-Config: output_dir, database, consultant_number, client_number. No credentials.
+Config: output_dir, database, consultant_number, client_number, delivery_enabled.
+No credentials. Delivery is denied unless delivery_enabled is JSON true.
 SSH_ORIGINAL_COMMAND accepts only `index` or `get YYYY-MM BASENAME`.
 The account has read/traverse ACLs only on status.json and approved outbox data.
 Returns JSON with hashes; file bytes are base64 to avoid PowerShell 5.1 binary
@@ -88,11 +89,14 @@ def packet(cfg, period):
 def serve(cfg, command):
     """Dispatch a strict read-only request; return JSON-compatible response.
 
-    No shell execution. Refuses every read if preparation failed, detected
+    No shell execution. Requires explicit delivery enablement; also refuses
+    every read if preparation failed, detected
     changed queued periods or has not succeeded within the previous 48 hours.
     """
     if command != 'index' and not re.fullmatch('get (' + PERIOD + ') (' + NAME + ')', command):
         raise ValueError('Only index or get PERIOD BASENAME is allowed')
+    if cfg.get('delivery_enabled') is not True:
+        raise ValueError('Delivery is paused; verify DATEV target compatibility before enabling')
     root = Path(cfg['output_dir'])
     if not root.is_absolute() or root.is_symlink():
         raise ValueError('Invalid configured root')

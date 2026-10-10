@@ -11,6 +11,31 @@ Belegtransfer watcher. The scripts do not log in to DATEV, mail a tax adviser,
 post entries, mark transactions as exported or finalize bookings. Successful
 upload and target import require separate confirmation.
 
+## Known target incompatibility (2026-10-10)
+
+The first real upload to **new-version DATEV Belege online** was rejected with
+`DCO01301`: "The company is a user of the new version of Belege online."
+The XML package route implemented here is therefore **not compatible with that
+target**. Successful XSD validation, SSH delivery and Windows publication do
+not establish DATEV acceptance. Do not enable this route on a new-version target.
+
+DATEV's [migration FAQ](https://www.datev.de/web/de/berufsgruppenuebergreifend/service-und-support/umstellungen/auf-neue-version-datev-belege-online/fragen-und-antworten)
+currently lists Buchungsdatenservice and Belegbilderservice Rechnungswesen as
+compatible data services. XML-Schnittstelle online is associated with the
+later expanded release in DATEV's
+[release roadmap](https://www.datev.de/web/de/berufsgruppenuebergreifend/service-und-support/umstellungen/auf-neue-version-datev-belege-online/informationen-zu-den-zielgruppen-je-freigabeversion).
+Do not substitute a PDF-only upload while retaining the old EXTF `BEDI` links:
+ordinary uploads assign different document GUIDs (DATEV help document 1046147).
+A supported connector or an explicitly reconciled document-link mapping is
+needed before the combined handover is ready. Neither is implemented here.
+
+Set `delivery_enabled: false` in the root-owned Linux reader configuration to
+block both index and file downloads without deleting queued packets or their
+duplicate records. Also disable Windows publication and the dedicated
+Belegtransfer watcher, and retain/quarantine the rejected ZIP outside watched
+folders. A server-side pause cannot remove an already published Windows file.
+Never reset delivery state or requeue the month just to retry this error.
+
 ## Requirements and installation
 
 - Python 3.11+, Linux/systemd; Perl with kivitendo console dependencies and XML::LibXML.
@@ -141,6 +166,9 @@ Match all
 
 Validate with `sshd -t` before reloading ssh. Adapt the reader example JSON;
 it contains only the output root and client identity, no database credentials.
+The reader now denies delivery unless `delivery_enabled` is explicitly JSON
+`true`; missing values, strings and numbers also deny it. Existing installations
+must make an explicit compatibility decision before enabling this setting.
 Grant this account traversal only through otherwise-private parent directories,
 read access to its reader config and `status.json`, and read/traverse access to
 `outbox/`. Never add it to the web application's general access group or grant

@@ -28,7 +28,7 @@ class ReaderTests(unittest.TestCase):
         self.folder = self.root / 'outbox' / '2026-07'
         self.folder.mkdir(parents=True)
         self.cfg = dict(output_dir=str(self.root), database='example_skr04',
-                        consultant_number='1001', client_number='1')
+                        consultant_number='1001', client_number='1', delivery_enabled=True)
         self.status = dict(status='prepared_not_transferred', changed_queued_periods=[],
                           checked_at=dt.datetime.now(dt.timezone.utc).isoformat())
         self.write_status()
@@ -54,6 +54,18 @@ class ReaderTests(unittest.TestCase):
         reply = reader.serve(self.cfg, 'get 2026-07 EXTF_example.csv')
         self.assertEqual(index['packets'][0]['packet_sha256'], reply['packet_sha256'])
         self.assertEqual(reply['sha256'], self.manifest['files'][self.csv.name])
+
+    def test_delivery_requires_explicit_enable(self):
+        """A pause blocks index and direct file reads, even with a valid packet."""
+        for value in (False, None, 'true', 1):
+            cfg = dict(self.cfg, delivery_enabled=value)
+            for command in ('index', 'get 2026-07 EXTF_example.csv'):
+                with self.subTest(value=value, command=command), self.assertRaisesRegex(ValueError, 'paused'):
+                    reader.serve(cfg, command)
+        cfg = dict(self.cfg)
+        cfg.pop('delivery_enabled')
+        with self.assertRaisesRegex(ValueError, 'paused'):
+            reader.serve(cfg, 'index')
 
     def test_commands_and_paths_rejected(self):
         """No shell, SCP/SFTP, path traversal, arguments or extra lines allowed."""
