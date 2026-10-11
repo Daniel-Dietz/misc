@@ -298,3 +298,11 @@ write the outbox nor read the application's private configuration/snapshots.
 The existing handover regression tests and the hardened Linux service passed
 again after adding schema-2 manifests and publication ACLs. This validation
 does not establish acceptance of any booking batch in DATEV Rechnungswesen.
+
+## Individual-document fallback (October 2026)
+
+The rejected XML package is quarantined. Source delivery, Windows polling/publication and Belegtransfer automatic upload are paused; the watched directories were verified empty. Do not reset July duplicate state.
+
+`kivitendo-datev-manual-documents.py` prepares an explicitly reviewed cutoff snapshot as individual files. Original document bytes must match the current manifest. Additional documents are selected explicitly; a document date and its booking period may differ. CSVs remain in a `NOCH_NICHT_IMPORTIEREN` folder until the actual new DATEV IDs have been obtained and their links replaced. Generated bank/payment PDFs are labeled reading copies, not original bank statements. The helper does not upload, mark a document as booked or change the ledger. Configuration and manifests contain private data and must remain outside Git.
+
+Verification performed: one three-month snapshot, exact original-document hashes, current CSV headers/client/column counts, cutoff bank totals, and visual inspection of all generated PDF pages. DATEV upload, ID mapping and actual Kanzlei test import are separate operational gates, not proof supplied by this script.
