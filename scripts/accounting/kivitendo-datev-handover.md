@@ -299,7 +299,7 @@ The existing handover regression tests and the hardened Linux service passed
 again after adding schema-2 manifests and publication ACLs. This validation
 does not establish acceptance of any booking batch in DATEV Rechnungswesen.
 
-## Individual-document fallback (October 2026)
+## Individual-document fallback (October 2026, historical after client recreation)
 
 The rejected XML package is quarantined. Source delivery, Windows polling/publication and Belegtransfer automatic upload are paused; the watched directories were verified empty. Do not reset July duplicate state.
 
@@ -308,3 +308,13 @@ The rejected XML package is quarantined. Source delivery, Windows polling/public
 Verification performed: one three-month snapshot, exact original-document hashes, current CSV headers/client/column counts, cutoff bank totals, and visual inspection of all generated PDF pages. DATEV upload, ID mapping and actual Kanzlei test import are separate operational gates, not proof supplied by this script.
 
 `kivitendo-datev-finalize-manual.py PREPARED OBSERVED_IDS_JSON NEW_OUTPUT` validates a complete filename-to-DATEV-UUID mapping obtained through the official document UI. It verifies unchanged document hashes, rewrites existing BEDI references and rejects changes to any other CSV field. No invented document links are added to unlinked journal rows. The successful three-month run updated 29 links in 61 rows after 20 documents were accepted by Upload online. Local acceptance and mapping do not establish a successful Kanzlei-Rechnungswesen import. Observed E-invoice/OCR notices are recorded in the private handover notes. The legacy XML queue and automatic publication remain paused.
+
+## Complete receipt package after client recreation
+
+After the adviser deletes and recreates the Belege online company in extended mode, previous upload confirmations and manually assigned DATEV IDs are historical. Keep the old state and quarantine; do not republish old month packets or reuse the manual CSV link mapping. Recreating Belege online does not itself establish that Kanzlei-Rechnungswesen booking imports were removed.
+
+`kivitendo-datev-complete-package.py PRIVATE_CONFIG_JSON` builds one new XML ZIP from a fresh cutoff snapshot and an explicitly reviewed receipt list. Config keys: `source` (contains `Quellmanifest.json` and `Buchungen`), `documents_dir`, `mapping`, `schema` (official offline `Document_v060.xsd` with its type schema alongside), `output` (new private directory), `cutoff`, `fiscal_year_start`, `expected_documents`. All financial configuration and document lists stay outside Git. Python 3.11+ and lxml are required; no network or ledger writes occur.
+
+The builder preserves source invoice GUIDs, ignores old manually generated DATEV IDs, and assigns stable evidence GUIDs to reading copies that have no source GUID. Each PDF/PNG is one XML File extension. Invoice types are 1/2; other evidence omits the optional type, as specified by DATEV. `processID=2` and repository metadata archive/finalize receipts without XML booking proposals. The ZIP has one root `document.xml`, no nested document ZIPs. Full original filenames remain in the private mapping; XML descriptions use DATEV's 40-character limit. CSVs are copied byte-for-byte from the fresh exporter and remain separate for the Kanzlei import.
+
+Verification on the reviewed cutoff run: 20 unique documents (19 PDFs, one PNG), 13 source-linked invoices, 61 CSV rows and 29 matching BEDI links; official XML schema, complete file references, hashes and unchanged CSV bytes checked. Actual target identity, SmartLogin, transfer logs, receipt acceptance and first Kanzlei import remain pending. The outer bundle is for downloading/extracting; only the inner full XML receipt ZIP is passed to Belegtransfer. Automatic delivery/publication stays paused until the actual target and complete import have been verified.
