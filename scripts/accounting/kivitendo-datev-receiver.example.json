@@ -1,0 +1,10 @@
+{
+  "root": "C:\\Users\\example\\AppData\\Local\\Company\\DATEV",
+  "database": "example_skr04",
+  "consultant_number": "1001",
+  "client_number": "1",
+  "ssh_executable": "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
+  "ssh_config": "C:\\Users\\example\\AppData\\Local\\Company\\DATEV\\Config\\ssh_config",
+  "watch_subdirectory": "1001-1\\ohne Belegtyp",
+  "publish_enabled": false
+}
